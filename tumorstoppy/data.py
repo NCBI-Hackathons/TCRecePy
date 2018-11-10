@@ -33,6 +33,17 @@ class Data (object):
         # data elements aquired from both './file1' and './file2'
         ...
         ], dtype='<U30')
+    >>> seqs.files
+    [ './file1', './file2' ]
+    >>> new_paths = ['./file3', './file4']
+    >>> new_seqs = Data(new_paths, ['seq3', 'seq4'])
+    # You can use Data objects to build a superset of data
+    >>> all_data = Data([seqs, new_seqs], ['old', 'new'])
+    >>> all_data['new', 'seq4']
+    array([
+        # data elements aquired from './file4'
+        ...
+        ], dtype='<U30')
     """
     def __init__(self, data, keys, lines=None):
         self._files = {}
