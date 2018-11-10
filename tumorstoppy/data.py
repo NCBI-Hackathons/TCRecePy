@@ -34,22 +34,26 @@ class Data (object):
         ...
         ], dtype='<U30')
     """
-    def __init__(self, data, keys):
+    def __init__(self, data, keys, lines=None):
         self._files = {}
         self._data = {}
 
         for i, (obj, key) in enumerate(zip(data, keys)):
             if isinstance(obj, str):
                 self._files[key] = obj
-                self._data[key] = np.fromiter(self._pull_data(key), '<U30')
+                self._data[key] = np.fromiter(self._pull_data(key,lines), '<U30')
             else:
                 self._files[key] = list(obj.files)
                 self._data[key] = obj
 
-    def _pull_data(self, key):
+    def _pull_data(self, key, lines=None):
         with open(Path(self._files[key]), 'r') as FILE:
-            for seq in FILE.readlines():
-                yield seq.strip('\n')
+            if lines == None:
+                for seq in FILE.readlines():
+                    yield seq.strip('\n')
+            else:
+                for i in range(lines):
+                    yield FILE.readlines()[0].strip('\n')
 
     @property
     def files(self):
