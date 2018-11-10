@@ -9,6 +9,8 @@ def error_evaluation(weights, data, gaps=0):
 
     for i in range(N1):
         for j in range(i+1,N1):
+            if not j % 1000:
+                print('({}, {})'.format(i,j))
             Mean1 += list(blosum62_distance(data['tumorous'][i],
                                          data['tumorous'][j],
                                          weights, gaps))[0]
