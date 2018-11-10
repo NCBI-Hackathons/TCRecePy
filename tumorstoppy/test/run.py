@@ -28,11 +28,20 @@ weights = np.array([ 8.31503303,  6.3603994 ,  2.26271026, -1.51866793,  7.57405
 def dist(s1, s2):
     return distance(s1, s2, weights)
 
-results = []
+results_cancer = []
 for seq in cut_cdr3['test','tumorous']:
     print('Testing ' + seq)
-    results.append(knn.nearest_neighbor(seq, *cut_cdr3['training'], dist))
+    results_cancer.append(knn.nearest_neighbor(seq, *cut_cdr3['training'], dist))
+print('Finished tumorous tests')
+results_cancer = np.array(results_cancer)
+results_non_cancer = []
+for seq in cut_cdr3['test','benign']:
+    print('Testing ' + seq)
+    results_non_cancer.append(knn.nearest_neighbor(seq, *cut_cdr3['training'], dist))
+results_non_cancer = np.array(results_non_cancer)
+print('Finished benign tests')
 
-results = np.array(results)
-print(results)
-print(np.mean(results))
+with open('results.txt', 'w') as FILE:
+    FILE.write(str(results_cancer))
+    FILE.write('\n\n')
+    FILE.write(str(results_non_cancer))
