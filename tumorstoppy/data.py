@@ -64,7 +64,7 @@ class Data (object):
                     yield seq.strip('\n')
             else:
                 for i in range(lines):
-                    yield FILE.readlines()[0].strip('\n')
+                    yield FILE.readline().rstrip('\n')
 
     @property
     def files(self):
