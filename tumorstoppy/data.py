@@ -3,6 +3,9 @@ import itertools as it
 from pathlib import Path
 
 class Data (object):
+    """
+    Represents collections of data retreived from files.
+    """
     def __init__(self, data, classifiers):
         self._files = {}
         self._data = {}
@@ -26,7 +29,7 @@ class Data (object):
 
     @property
     def data(self):
-        return list(it.chain(*self._data.values()))
+        return np.fromiter(it.chain(*self._data.values()), '<U30')
 
     def values(self):
         return list(self._data.values())

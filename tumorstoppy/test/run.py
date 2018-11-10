@@ -1,3 +1,4 @@
+from importlib import reload
 import numpy as np
 import itertools as it
 import distances

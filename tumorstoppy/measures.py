@@ -21,7 +21,7 @@ def error_evaluation(weights, data, gaps=0):
     Mean2 /= N1*N2
 
     for i in range(N2):
-        if verbose: print('3, {0:.1f}%'.format(100*(i/N3)))
+        if verbose: print('3, {0:.1f}%'.format(100*(i/N2)))
         for j in range(i+1,N2):
             Mean3 += list(blosum62_distance(data2[i], data2[j], weights, gaps))[0]
     Mean3 /= N2*N2
