@@ -5,12 +5,40 @@ from pathlib import Path
 class Data (object):
     """
     Represents collections of data retreived from files.
+
+    Data is an immutable, dictionary-like structure, so subsets of data
+    within it are represented by keys.
+
+    Parameters
+    ==========
+    data : iterable of data objects. If this object is a string, it assumed
+           that the string represents the path of a file to retrieve data from.
+           Objects that are not strings should be iterables,
+           such as other objects of type Data.
+    keys : iterable of strings representing the keys used to classify
+           objects in the above data array.
+
+    Examples
+    ========
+    >>> from tumorstoppy.data import Data
+    >>> paths = ['./file1', './file2']
+    >>> seqs = Data(paths, ['seq1', 'seq2'])
+    >>> seqs['seq1']
+    array([
+        # data elements aquired from './file1'
+        ...
+        ], dtype='<U30')
+    >>> seqs.data
+    array([
+        # data elements aquired from both './file1' and './file2'
+        ...
+        ], dtype='<U30')
     """
-    def __init__(self, data, classifiers):
+    def __init__(self, data, keys):
         self._files = {}
         self._data = {}
 
-        for i, (obj, key) in enumerate(zip(data, classifiers)):
+        for i, (obj, key) in enumerate(zip(data, keys)):
             if isinstance(obj, str):
                 self._files[key] = obj
                 self._data[key] = np.fromiter(self._pull_data(key), '<U30')
@@ -29,7 +57,10 @@ class Data (object):
 
     @property
     def data(self):
-        return np.fromiter(it.chain(*self._data.values()), '<U30')
+        try:
+            return np.fromiter(it.chain(*self._data.values()), '<U30')
+        except ValueError:
+            return self.values()
 
     def values(self):
         return list(self._data.values())
