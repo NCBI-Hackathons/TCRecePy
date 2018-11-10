@@ -63,11 +63,12 @@ def blosum62_distance(seqs1, seqs2, weights=None, allowed_gaps=0):
                 warn('insufficient or invalid number of allowed gaps',
                      RuntimeWarning, stacklevel=2)
                 yield 1.
-        if weights and len(weights) is not len(s1):
+        if weights is not None and len(weights) is not len(s1):
+            print('{}, {}'.format(len(weights),len(s1)))
             raise ValueError('not enough weights for test data')
         elif not isinstance(weights, (list,tuple)):
             weights = np.array(weights)
-        if weights:
+        if weights is not None:
             yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
         else:
             yield sigmoid(sum(blosum62_score(s1,s2)))

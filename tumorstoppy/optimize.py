@@ -1,17 +1,14 @@
 # Optimization functions
 import numpy as np
 from scipy.optimize import minimize
-from measures import *
-from data import *
+from tumorstoppy.measures import *
+from tumorstoppy.data import *
 
 # TODO
 # Load the appropriate data
 # Create a partially passed-argument-function
 # Optimize based on some randomly chosen weights
 # Celebrate
-
-def f(w):
-    return sum([x*x for x in w])
 
 data_points = 100
 
@@ -28,9 +25,9 @@ CDR3_13 = Data(
         )
 
 w0 = [4] * 13
-f = lambda w : error_evaluation(w,CDR3_13['training'],verbose=True)
+f = lambda w : error_evaluation(w,CDR3_13['training'],verbose=False)
 
-result = minimize(f, w0, method="nelder-mead", options={'xtol': 1e-8, 'disp': True})
+result = minimize(f, w0, method="nelder-mead", options={'xtol': 1e-4, 'disp': True})
 print (result)
 
 # print(error_evaluation(None,CDR3_13['training'],verbose=True))
