@@ -34,8 +34,5 @@ for seq in cut_cdr3['test','tumorous']:
     results.append(knn.nearest_neighbor(seq, *cut_cdr3['training'], dist))
 
 results = np.array(results)
-
-success = results[results>1]
-failure = results[results<1]
-
-print(len(success)/len(failure))
+print(results)
+print(np.mean(results))
