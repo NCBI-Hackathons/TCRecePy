@@ -24,3 +24,6 @@ def error_evaluation(weights, data, gaps=0):
     Mean3 /= N2*N2
 
     return (Mean1 + Mean3) / Mean2
+
+def concurrent_error_evaluation(weights, data, gaps=0):
+
