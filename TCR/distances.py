@@ -1,58 +1,58 @@
 import numpy as np
-from itertools import product
-from Bio import pairwise2 as pairwise
+import itertools as it
+from Bio import pairwise2
 from Bio.SubsMat import MatrixInfo as matlist
 
 def sigmoid (z):
-    return 1 / ( 1 + math.exp(-z) )
+    """
+    The sigmoid, or logistic, function defined for all real numbers z.
+    Returns values on the interval [0., 1.] and is bijective.
+    """
+    return 1 / (1+np.exp(z))
 
-def trivial_cost(c1, c2):
-    return 0 if (c1 == c2 and '-' not in (c1,c2)) else 1
+def blosum62_score(s1, s2):
+    """
+    Compute the score between two sequences defined by the blosum62 matrix.
+    The score measures the similarity between sequences
+    and ranges from -4 to 11.
 
-def blosum62(c1, c2):
-    return matlist.blosum62[(c1, c2)] if '-' not in (c1, c2) else -4
+    Returns a generator of the list of scores with each element corresponding
+    to the score of each character of the sequences.
+    """
+    for pair in zip(s1,s2):
+        yield matlist.blosum62[pair] if '-' not in pair else -4
 
-def distance(string1, string2, weights):
-    # NOTE: We assume that the two strings and their corresponding weights are of the same length
-    if len(string1) != len(string2) && if len(string1) != len(weights):
-        raise ValueError("Error calling distance function: string1 and string2 are of different lengths")
-    
-    output = 0
-    for i in range(string1):
-        output += weights[i] * blosum62(string1[i],string2[i])
-    return output
-
-def levenshtein_distance(s1, s2, cost_func=trivial_cost):
-    s1 = '-' + s1
-    s2 = '-' + s2
-    l1,l2 = len(s1), len(s2)
-    dist = np.zeros((l1,l2))
-
-    for i in range(1,l1):
-        dist[i,0] = dist[i-1,0] + cost_func(s1[i],s2[0])
-    for j in range(1,l2):
-        dist[0,j] = dist[0,j-1] + cost_func(s1[0],s2[j])
-
-    for i,j in product(range(1,l1), range(1,l2)):
-        dist[i,j] = min(
-                [
-                    dist[i-1,j] + cost_func(s1[i], s2[0]), # deletion
-                    dist[i,j-1] + cost_func(s1[0], s2[j]), # addition
-                    dist[i-1,j-1] + cost_func(s1[i], s2[j]), # substitution
-                    ])
-
-    return dist[l1,l2]
-
-def blosum62_distance(s1, s2, weights=None):
-    if len(s1) is not len(s2):
-        pairs = pairwise.align.globaldx(s1, s2, matlist.blosum62)
-        s1, s2 = sorted(pairs, key=lambda p: p[2])[0][:1]
+def blosum62_distance(s1, s2, weights=None, allowed_gaps=0):
+    """
+    Returns the distance between two sequences as measured
+    by a logistic function on the domain [0.,1.].
+    A distance of 0. implies the sequences are the same, while
+    a distance of 1. implies that the sequences are infinitely different.
+    """
+    if 0 in (len(s1), len(s2)): return 1.
+    elif len(s1) is not len(s2):
+        # sort the pairs that we recieve by their unweighted scores.
+        pairs = pairwise2.align.globaldx(s1, s2, matlist.blosum62)\
+                    .sort(key=lambda p: p[2], reverse=True)
+        try:
+            # eliminate matches that don't match our criteria.
+            s1, s2 = it.filterfalse(
+                    lambda p: p[0].count('-') is not allowed_gaps,
+                    pairs,
+                    )[0][:2]
+        except (IndexError, ValueError):
+            # thrown in the case it.filterfalse returns an empty list.
+            return 1.
 
     if not weights:
-        weights = len(s1)*[1]
-
-    cost = 0
-    for i in range(len(s1)):
-        cost += weights[i] * blosum62(s1[i], s2[i])
-
-    return cost
+        weights = np.array(len(s1)*[1])
+    elif len(weights) is not len(s1):
+        raise ValueError('not enough weights for test data')
+    elif not isinstance(weights, (list,tuple)):
+        weights = np.array(weights)
+    try:
+        return sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
+    except KeyError:
+        # blosum62 will throw this should it find a pair of characters
+        # it does not recognize.
+        return 1.
