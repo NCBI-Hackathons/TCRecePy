@@ -21,7 +21,13 @@ def blosum62_score(s1, s2):
     to the score of each character of the sequences.
     """
     for pair in zip(s1,s2):
-        yield matlist.blosum62[pair] if '-' not in pair else -4
+        try:
+            yield matlist.blosum62[pair]
+        except KeyError as err:
+            warn('unknown amino acid substitution encountered: {}'\
+                    .format(*err.args),
+                 RuntimeWarning, stacklevel=2)
+            yield -4
 
 def blosum62_distance(seqs1, seqs2, weights=None, allowed_gaps=0):
     """
@@ -55,10 +61,4 @@ def blosum62_distance(seqs1, seqs2, weights=None, allowed_gaps=0):
             raise ValueError('not enough weights for test data')
         elif not isinstance(weights, (list,tuple)):
             weights = np.array(weights)
-        try:
-            yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
-        except KeyError as err:
-            warn('unknown amino acid substitution encountered: {}'\
-                    .format(*err.args),
-                 RuntimeWarning, stacklevel=2)
-            yield 1.
+        yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))

@@ -53,10 +53,24 @@ AA = np.genfromtxt(
 
 CDR3 = Data(
         [
-            Data(['./data/TumorCDR3s_test.txt','./data/NonTumorCDR3s_test.txt'],
+            Data(['./data/TumorCDR3s_test.txt',
+                  './data/NonTumorCDR3s_test.txt'],
                  ['tumorous', 'benign']),
-            Data(['./data/TumorCDR3s_training.txt','./data/NonTumorCDR3s_training.txt'],
+            Data(['./data/TumorCDR3s_training.txt',
+                  './data/NonTumorCDR3s_training.txt'],
                  ['tumorous', 'benign'])
+            ],
+        ['test', 'training'],
+        )
+
+CDR3_13 = Data(
+        [
+            Data(['./data/processed_data/TumorCDR3s_test/TumorCDR3s_test_13.txt',
+                  './data/processed_data/NonTumorCDR3s_test/NonTumorCDR3s_test_13.txt'],
+                 ['tumorous', 'benign']),
+            Data(['./data/processed_data/TumorCDR3s_training/TumorCDR3s_training_13.txt',
+                  './data/processed_data/NonTumorCDR3s_training/NonTumorCDR3s_training_13.txt'],
+                 ['tumorous', 'benign']),
             ],
         ['test', 'training'],
         )
