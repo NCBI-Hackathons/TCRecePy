@@ -4,6 +4,14 @@ from warnings import warn
 from Bio import pairwise2
 from Bio.SubsMat import MatrixInfo as matlist
 
+blosum62 = matlist.blosum62
+terms = {}
+for key, value in zip(blosum62.keys(), blosum62.values()):
+    key = tuple(reversed(key))
+    if key not in blosum62.keys():
+        terms.update({key:value})
+blosum62.update(terms)
+
 def sigmoid (z):
     """
     The sigmoid, or logistic, function defined for all real numbers z.
@@ -22,10 +30,7 @@ def blosum62_score(s1, s2):
     """
     for pair in zip(s1,s2):
         try:
-            if pair in matlist.blosum62.keys():
-                yield matlist.blosum62[pair]
-            else:
-                yield matlist.blosum62[tuple(reversed(pair))]
+            yield matlist.blosum62[pair]
         except KeyError as err:
             warn('unknown amino acid substitution encountered: {}'\
                     .format(*err.args),
@@ -58,10 +63,11 @@ def blosum62_distance(seqs1, seqs2, weights=None, allowed_gaps=0):
                 warn('insufficient or invalid number of allowed gaps',
                      RuntimeWarning, stacklevel=2)
                 yield 1.
-        if weights is None:
-            weights = np.array(len(s1)*[1])
-        elif len(weights) is not len(s1):
+        if weights and len(weights) is not len(s1):
             raise ValueError('not enough weights for test data')
         elif not isinstance(weights, (list,tuple)):
             weights = np.array(weights)
-        yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
+        if weights:
+            yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
+        else:
+            yield sigmoid(sum(blosum62_score(s1,s2)))
