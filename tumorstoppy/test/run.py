@@ -1,9 +1,9 @@
 import numpy as np
 import itertools as it
-from ..distances import *
-from ..measures import *
-from ..data import *
+import distances
+import measures
+import data
 
-cdr3 = CDR3_13
-dist = distances.blosum62_distance
-erreval = measures.error_evaluation
+cdr3 = data.CDR3_13
+error_evaluation = measures.error_evaluation
+print(error_evaluation(None, cdr3['training'], verbose=True))
