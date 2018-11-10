@@ -3,11 +3,24 @@ from itertools import product
 from Bio import pairwise2 as pairwise
 from Bio.SubsMat import MatrixInfo as matlist
 
+def sigmoid (z):
+    return 1 / ( 1 + math.exp(-z) )
+
 def trivial_cost(c1, c2):
     return 0 if (c1 == c2 and '-' not in (c1,c2)) else 1
 
 def blosum62(c1, c2):
     return matlist.blosum62[(c1, c2)] if '-' not in (c1, c2) else -4
+
+def distance(string1, string2, weights):
+    # NOTE: We assume that the two strings and their corresponding weights are of the same length
+    if len(string1) != len(string2) && if len(string1) != len(weights):
+        raise ValueError("Error calling distance function: string1 and string2 are of different lengths")
+    
+    output = 0
+    for i in range(string1):
+        output += weights[i] * blosum62(string1[i],string2[i])
+    return output
 
 def levenshtein_distance(s1, s2, cost_func=trivial_cost):
     s1 = '-' + s1
