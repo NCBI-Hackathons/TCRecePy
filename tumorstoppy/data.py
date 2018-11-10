@@ -10,7 +10,7 @@ class Data (object):
         for i, (obj, key) in enumerate(zip(data, classifiers)):
             if isinstance(obj, str):
                 self._files[key] = obj
-                self._data[key] = np.fromiter(self._pull_data(key), '<U30')
+                self._data[key] = list(self._pull_data(key))
             else:
                 self._files[key] = list(obj.files)
                 self._data[key] = obj
