@@ -1,5 +1,9 @@
 from time import time
+<<<<<<< HEAD
 from distances import *
+=======
+from tumorstoppy.distances import *
+>>>>>>> 0ac875c... fixed setup.py
 t1=time()
 
 s1="CASSGATGREKFF"
