@@ -1,5 +1,6 @@
 import numpy as np
 import itertools as it
+from warnings import warn
 from Bio import pairwise2
 from Bio.SubsMat import MatrixInfo as matlist
 
@@ -22,37 +23,42 @@ def blosum62_score(s1, s2):
     for pair in zip(s1,s2):
         yield matlist.blosum62[pair] if '-' not in pair else -4
 
-def blosum62_distance(s1, s2, weights=None, allowed_gaps=0):
+def blosum62_distance(seqs1, seqs2, weights=None, allowed_gaps=0):
     """
-    Returns the distance between two sequences as measured
+    Returns the distances between each pair of sequences as measured
     by a logistic function on the domain [0.,1.].
     A distance of 0. implies the sequences are the same, while
     a distance of 1. implies that the sequences are infinitely different.
     """
-    if 0 in (len(s1), len(s2)): return 1.
-    elif len(s1) is not len(s2):
-        # sort the pairs that we recieve by their unweighted scores.
-        pairs = pairwise2.align.globaldx(s1, s2, matlist.blosum62)\
-                    .sort(key=lambda p: p[2], reverse=True)
+    for s1, s2 in zip(seqs1, seqs2):
+        if 0 in (len(s1), len(s2)):
+            warn('empty sequence passed', RuntimeWarning, stacklevel=2)
+            yield 1.
+        elif len(s1) is not len(s2):
+            # sort the pairs that we recieve by their unweighted scores.
+            pairs = pairwise2.align.globaldx(s1, s2, matlist.blosum62)\
+                        .sort(key=lambda p: p[2], reverse=True)
+            try:
+                # eliminate matches that don't match our criteria.
+                s1, s2 = it.filterfalse(
+                        lambda p: p[0].count('-') is not allowed_gaps,
+                        pairs,
+                        )[0][:2]
+            except (IndexError, TypeError):
+                # thrown in the case it.filterfalse returns an empty list.
+                warn('insufficient or invalid number of allowed gaps',
+                     RuntimeWarning, stacklevel=2)
+                yield 1.
+        if weights is None:
+            weights = np.array(len(s1)*[1])
+        elif len(weights) is not len(s1):
+            raise ValueError('not enough weights for test data')
+        elif not isinstance(weights, (list,tuple)):
+            weights = np.array(weights)
         try:
-            # eliminate matches that don't match our criteria.
-            s1, s2 = it.filterfalse(
-                    lambda p: p[0].count('-') is not allowed_gaps,
-                    pairs,
-                    )[0][:2]
-        except (IndexError, ValueError):
-            # thrown in the case it.filterfalse returns an empty list.
-            return 1.
-
-    if not weights:
-        weights = np.array(len(s1)*[1])
-    elif len(weights) is not len(s1):
-        raise ValueError('not enough weights for test data')
-    elif not isinstance(weights, (list,tuple)):
-        weights = np.array(weights)
-    try:
-        return sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
-    except KeyError:
-        # blosum62 will throw this should it find a pair of characters
-        # it does not recognize.
-        return 1.
+            yield sigmoid(weights @ np.fromiter(blosum62_score(s1,s2),int))
+        except KeyError as err:
+            warn('unknown amino acid substitution encountered: {}'\
+                    .format(*err.args),
+                 RuntimeWarning, stacklevel=2)
+            yield 1.

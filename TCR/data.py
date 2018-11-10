@@ -10,8 +10,7 @@ class Data (object):
         for i, (obj, key) in enumerate(zip(data, classifiers)):
             if isinstance(obj, str):
                 self._files[key] = obj
-                self._data[key] = list(it.zip_longest(self._pull_data(key),
-                                                      [], fillvalue=key))
+                self._data[key] = list(self._pull_data(key))
             else:
                 self._files[key] = list(obj.files)
                 self._data[key] = obj
@@ -29,11 +28,23 @@ class Data (object):
     def data(self):
         return list(it.chain(*self._data.values()))
 
+    def values(self):
+        return list(self._data.values())
+
+    def keys(self):
+        return list(self._data.keys())
+
     def __getitem__(self, keys=None):
         if isinstance(keys, tuple):
             return self._data[keys[0]].__getitem__(*keys[1:])
         else:
             return self._data[keys]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return (val for val in self.values())
 
 # Amino Acid dictionary
 AA = np.genfromtxt(
