@@ -13,6 +13,7 @@ def error_evaluation(weights, data, gaps=0):
     # Calculating M1
     for i in range(N1):
         for j in range(i+1,N1):
+            print('{}, {}'.format(i,j))
             M1 += list(blosum62_distance(data['tumorous'][i],
                                          data['tumorous'][j],
                                          weights, gaps))[0]

@@ -25,7 +25,7 @@ def blosum62_score(s1, s2):
             if pair in matlist.blosum62.keys():
                 yield matlist.blosum62[pair]
             else:
-                yield matlist.blosum62[list(pair).reverse()]
+                yield matlist.blosum62[tuple(reversed(pair))]
         except KeyError as err:
             warn('unknown amino acid substitution encountered: {}'\
                     .format(*err.args),
