@@ -1,7 +1,7 @@
 from importlib import reload
 import numpy as np
 import itertools as it
-from tumorstoppy import distances, measures, data, knn
+from tcrecepy import distances, measures, data, knn
 
 data_points = 979
 Data = data.Data

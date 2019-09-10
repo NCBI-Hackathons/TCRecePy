@@ -1,7 +1,7 @@
 import numpy as np
 import itertools as it
 import operator as op
-from tumorstoppy.distances import *
+from tcrecepy.distances import *
 
 def error_evaluation(weights, data, gaps=0):
     N1, N2 = map(len, data)

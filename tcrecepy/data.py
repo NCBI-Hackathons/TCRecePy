@@ -20,7 +20,7 @@ class Data (object):
 
     Examples
     ========
-    >>> from tumorstoppy.data import Data
+    >>> from tcrecepy.data import Data
     >>> paths = ['./file1', './file2']
     >>> seqs = Data(paths, ['seq1', 'seq2'])
     >>> seqs['seq1']

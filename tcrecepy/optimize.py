@@ -1,8 +1,8 @@
 # Optimization functions
 import numpy as np
 from scipy.optimize import minimize
-from tumorstoppy.measures import *
-from tumorstoppy.data import *
+from tcrecepy.measures import *
+from tcrecepy.data import *
 
 # TODO
 # Load the appropriate data
